@@ -8,6 +8,7 @@ public class MyTokenizerKeywords extends CharTokenizer {
 
     @Override
     protected boolean isTokenChar(int c) {
+
         return c != ';';
     }
 }

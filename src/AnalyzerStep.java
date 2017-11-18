@@ -24,18 +24,26 @@ public class AnalyzerStep {
 
         analyzerPerField = new HashMap<>();
 
+        AnalyzerSimpleText aST = new AnalyzerSimpleText();
+
+        AnalyzerKeywords aK = new AnalyzerKeywords();
+
         //______________________TOKENIZAR,STEMMING, NORMALIZE______________________\\
-        analyzerPerField.put("title", new AnalyzerSimpleText());
 
-        analyzerPerField.put("abstract", new AnalyzerSimpleText());
+        analyzerPerField.put("title", aST);
 
-        analyzerPerField.put("source", new AnalyzerSimpleText());
+        analyzerPerField.put("abstract", aST);
+
+        analyzerPerField.put("source", aST);
         //_________________________________________________________________________\\
 
         //______________________TOKENIZAR, NORMALIZE______________________\\
-        analyzerPerField.put("keywords author", new KeywordAnalyzer());
 
-        analyzerPerField.put("keywords index", new KeywordAnalyzer());
+        analyzerPerField.put("keywords author", aK);
+
+        analyzerPerField.put("keywords index", aK);
+
+        analyzerPerField.put("author", aK);
 
         aWrapper = new PerFieldAnalyzerWrapper(new StandardAnalyzer(),analyzerPerField);
 
@@ -55,7 +63,7 @@ public class AnalyzerStep {
 
         String content, contenidoCampo;
 
-        int comienzoCadenaComa, comienzoCadenaComilla, finalCadena;
+        int comienzoCadenaComa, comienzoCadenaComilla, finalCadena, j, anterior;
 
         scanner.nextLine();
 
@@ -65,7 +73,9 @@ public class AnalyzerStep {
 
             Document doc = new Document();
 
-            for (int i = 10; i >= 1; i++) {
+            for (int i = 10; i >= 1; i--) {
+
+                contenidoCampo = "";
 
                 comienzoCadenaComa = content.indexOf(',');
 
@@ -88,13 +98,20 @@ public class AnalyzerStep {
 
                     content = content.substring(comienzoCadenaComilla + 1);
 
-                    finalCadena = content.indexOf('"');
+                    for (j = 0; content.charAt(j) != '"' || content.charAt(j+1) != ',' ; j++){
 
-                    //System.out.println(content.substring(0, finalCadena));
+                        if (content.charAt(j) == '"' && content.charAt(j+1) == '"') {
+                            j++;
+                        }
+                        else if (content.charAt(j) != '"'){
+                            contenidoCampo += content.charAt(j);
+                        }
 
-                    contenidoCampo = content.substring(0, finalCadena);
+                    }
 
-                    content = content.substring(finalCadena + 1);
+                    content = content.substring(j+1);
+
+                    //System.out.println(contenidoCampo);
 
                 } else {
 
@@ -115,7 +132,8 @@ public class AnalyzerStep {
 
                 if (i == 10){
                     //Aplicamos Analyzer para el campo Author.
-                    doc.add(new SortedDocValuesField("author", new BytesRef(contenidoCampo)));
+                    //doc.add(new SortedDocValuesField("author", new BytesRef(contenidoCampo)));
+                    doc.add(new TextField("author", contenidoCampo, Field.Store.YES));
                 }
                 else if(i == 9){
                     //Aplicamos Analyzer para el campo Title.
@@ -123,40 +141,50 @@ public class AnalyzerStep {
                 }
                 else if(i == 8){
                     //Aplicamos Analyzer para el campo Year.
-                    doc.add(new NumericDocValuesField("year", Integer.parseInt(contenidoCampo)));
+                    //doc.add(new NumericDocValuesField("year", Integer.parseInt(contenidoCampo)));
+                    doc.add(new LongPoint("year", Integer.parseInt(contenidoCampo)));
+                    doc.add(new StoredField("year", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 7){
                     //Aplicamos Analyzer para el campo Source.
                     doc.add(new TextField("source", contenidoCampo, Field.Store.YES));
                 }
                 else if(i == 6){
-                    //Aplicamos Analyzer para el campo Link.
-                    doc.add(new StringField("link", contenidoCampo, Field.Store.YES));
+                    //Aplicamos Analyzer para el campo Cited by.
+                    //doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
+                    doc.add(new LongPoint("cited by", Integer.parseInt(contenidoCampo)));
+                    doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 5){
-                    //Aplicamos Analyzer para el campo Cited by.
-                    doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
+                    //Aplicamos Analyzer para el campo Link.
+                    doc.add(new StringField("link", contenidoCampo, Field.Store.YES));
                 }
                 else if(i == 4){
                     //Aplicamos Analyzer para el campo Abstract.
                     doc.add(new TextField("abstract", contenidoCampo, Field.Store.YES));
                 }
-                else if(i == 3){
+                else if(i == 3 && contenidoCampo.length() > 0){
                     //Aplicamos Analyzer para el campo Keywords1.
-                    doc.add(new SortedDocValuesField("keywords author", new BytesRef(contenidoCampo)));
+                    //doc.add(new SortedDocValuesField("keywords author", new BytesRef(contenidoCampo)));
+                    doc.add(new TextField("keywords author", contenidoCampo, Field.Store.YES));
                 }
-                else if(i == 2){
+                else if(i == 2 && contenidoCampo.length() > 0){
                     //Aplicamos Analyzer para el campo Keywords2.
-                    doc.add(new SortedDocValuesField("keywords index", new BytesRef(contenidoCampo)));
+                    //doc.add(new SortedDocValuesField("keywords index", new BytesRef(contenidoCampo)));
+                    doc.add(new TextField("keywords index", contenidoCampo, Field.Store.YES));
                 }
                 else if(i == 1){
                     //Aplicamos Analyzer para el campo EID.
                     doc.add(new StringField("EID", contenidoCampo, Field.Store.YES));
                 }
-
-
             }
+
+            writer.addDocument(doc);
         }
+
+        writer.commit();
+
+        writer.close();
 
         scanner.close();
     }

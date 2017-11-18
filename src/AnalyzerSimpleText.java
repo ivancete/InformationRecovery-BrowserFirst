@@ -1,4 +1,6 @@
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
@@ -24,7 +26,7 @@ public class AnalyzerSimpleText extends Analyzer{
         TokenStream pipeline = source;
         pipeline = new StandardFilter(pipeline);
 
-        //pipeline = new EnglishPossessiveFilter(pipeline);
+        pipeline = new StopFilter(pipeline, EnglishAnalyzer.getDefaultStopSet());
 
         pipeline = new LowerCaseFilter(pipeline);
         pipeline = new PorterStemFilter(pipeline);

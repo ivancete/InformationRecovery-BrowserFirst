@@ -2,8 +2,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.analysis.pattern.PatternTokenizer;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+
+import java.util.regex.Pattern;
 
 public class AnalyzerKeywords extends Analyzer{
 
@@ -16,8 +18,10 @@ public class AnalyzerKeywords extends Analyzer{
     @Override
     protected Analyzer.TokenStreamComponents createComponents(String string){
 
+        Pattern p = Pattern.compile("[;,]\\s");
+
         //To change body of generated methods, choose Tools | Templates.
-        Tokenizer source = new MyTokenizerKeywords();
+        Tokenizer source = new PatternTokenizer(p, -1);
 
         TokenStream pipeline = source;
 
