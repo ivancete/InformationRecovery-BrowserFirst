@@ -6,6 +6,8 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.File;
@@ -142,7 +144,7 @@ public class AnalyzerStep {
                 else if(i == 8){
                     //Aplicamos Analyzer para el campo Year.
                     //doc.add(new NumericDocValuesField("year", Integer.parseInt(contenidoCampo)));
-                    doc.add(new IntPoint("year", Integer.parseInt(contenidoCampo)));
+                    doc.add(new NumericDocValuesField("year", Integer.parseInt(contenidoCampo)));
                     doc.add(new StoredField("year", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 7){
@@ -152,7 +154,7 @@ public class AnalyzerStep {
                 else if(i == 6){
                     //Aplicamos Analyzer para el campo Cited by.
                     //doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
-                    doc.add(new LongPoint("cited by", Integer.parseInt(contenidoCampo)));
+                    doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
                     doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 5){
