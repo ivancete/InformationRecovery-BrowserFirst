@@ -142,7 +142,7 @@ public class AnalyzerStep {
                 else if(i == 8){
                     //Aplicamos Analyzer para el campo Year.
                     //doc.add(new NumericDocValuesField("year", Integer.parseInt(contenidoCampo)));
-                    doc.add(new LongPoint("year", Integer.parseInt(contenidoCampo)));
+                    doc.add(new IntPoint("year", Integer.parseInt(contenidoCampo)));
                     doc.add(new StoredField("year", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 7){
