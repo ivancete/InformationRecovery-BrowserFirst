@@ -69,7 +69,7 @@ public class AnalyzerStep {
 
         String content, contenidoCampo;
 
-        int comienzoCadenaComa, comienzoCadenaComilla, finalCadena, j, anterior;
+        int comienzoCadenaComa, comienzoCadenaComilla, finalCadena, j;
 
         scanner.nextLine();
 
@@ -90,8 +90,6 @@ public class AnalyzerStep {
                 if (comienzoCadenaComilla != 0 && comienzoCadenaComa != 0){
 
                     finalCadena = content.indexOf(',');
-
-                    //System.out.println(content.substring(0, finalCadena));
 
                     contenidoCampo = content.substring(0, finalCadena);
 
@@ -117,8 +115,6 @@ public class AnalyzerStep {
 
                     content = content.substring(j+1);
 
-                    //System.out.println(contenidoCampo);
-
                 } else {
 
                     content = content.substring(comienzoCadenaComa + 1);
@@ -127,8 +123,6 @@ public class AnalyzerStep {
                         finalCadena = content.indexOf(',');
                     else
                         finalCadena = content.length();
-
-                    //System.out.println(content.substring(0, finalCadena));
 
                     contenidoCampo = content.substring(0, finalCadena);
 
@@ -158,8 +152,8 @@ public class AnalyzerStep {
                 else if(i == 6){
                     //Aplicamos Analyzer para el campo Cited by.
                     //doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
-                    doc.add(new TextField("cited by", contenidoCampo, Field.Store.YES));
-                    //doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
+                    doc.add(new LongPoint("cited by", Integer.parseInt(contenidoCampo)));
+                    doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 5){
                     //Aplicamos Analyzer para el campo Link.
