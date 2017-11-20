@@ -18,7 +18,7 @@ public class AnalyzerKeywords extends Analyzer{
     @Override
     protected Analyzer.TokenStreamComponents createComponents(String string){
 
-        Pattern p = Pattern.compile("[;,]\\s");
+        Pattern p = Pattern.compile("[;,]\\s*");
 
         //To change body of generated methods, choose Tools | Templates.
         Tokenizer source = new PatternTokenizer(p, -1);

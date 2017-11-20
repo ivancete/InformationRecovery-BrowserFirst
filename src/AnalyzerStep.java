@@ -1,12 +1,12 @@
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.BytesRef;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -24,17 +24,15 @@ public class AnalyzerStep {
 
         analyzerPerField = new HashMap<>();
 
-        AnalyzerSimpleText aST = new AnalyzerSimpleText();
-
         AnalyzerKeywords aK = new AnalyzerKeywords();
 
         //______________________TOKENIZAR,STEMMING, NORMALIZE______________________\\
 
-        analyzerPerField.put("title", aST);
+        analyzerPerField.put("title", new EnglishAnalyzer());
 
-        analyzerPerField.put("abstract", aST);
+        analyzerPerField.put("abstract", new EnglishAnalyzer());
 
-        analyzerPerField.put("source", aST);
+        analyzerPerField.put("source", new EnglishAnalyzer());
         //_________________________________________________________________________\\
 
         //______________________TOKENIZAR, NORMALIZE______________________\\
@@ -44,6 +42,14 @@ public class AnalyzerStep {
         analyzerPerField.put("keywords index", aK);
 
         analyzerPerField.put("author", aK);
+
+        //_________________________________________________________________________\\
+
+        //______________________TOKENIZAR, NORMALIZE______________________\\
+
+        analyzerPerField.put("year", new WhitespaceAnalyzer());
+
+        analyzerPerField.put("cited by", new WhitespaceAnalyzer());
 
         aWrapper = new PerFieldAnalyzerWrapper(new StandardAnalyzer(),analyzerPerField);
 
@@ -152,8 +158,8 @@ public class AnalyzerStep {
                 else if(i == 6){
                     //Aplicamos Analyzer para el campo Cited by.
                     //doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
-                    doc.add(new LongPoint("cited by", Integer.parseInt(contenidoCampo)));
-                    doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
+                    doc.add(new TextField("cited by", contenidoCampo, Field.Store.YES));
+                    //doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
                 }
                 else if(i == 5){
                     //Aplicamos Analyzer para el campo Link.
