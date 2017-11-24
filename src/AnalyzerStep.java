@@ -95,6 +95,8 @@ public class AnalyzerStep {
 
         facetsconfig.setMultiValued("keywords index",true);
 
+        facetsconfig.setMultiValued("author",true);
+
         DirectoryTaxonomyWriter taxoWriter = new DirectoryTaxonomyWriter (facetas) ;
 
         IndexWriter writer = new IndexWriter(directorioIndice, config);
@@ -110,11 +112,22 @@ public class AnalyzerStep {
     }
 
     //_______________________Función que particiona las facetas por los puntos comas y espacios_______________________\\
-    public String [] modificarFaceta(String cadena){
+    public String [] modificarFacetaKeyword(String cadena){
 
         cadena = cadena.toLowerCase();
 
         String [] facetas = cadena.split("; ");
+
+        return facetas;
+
+    }
+
+    //__________________________Función que particiona las facetas por los comas y espacios___________________________\\
+    public String [] modificarFacetaAuthor(String cadena){
+
+        cadena = cadena.toLowerCase();
+
+        String [] facetas = cadena.split(", ");
 
         return facetas;
 
@@ -197,8 +210,22 @@ public class AnalyzerStep {
     //______________________Función que inserta los datos en los campos del documento a indexar_______________________\\
     public void insertarCampo(String contenidoCampo, int campo, Document doc){
 
+        //Introducimos los datos referentes al author.
+        if (campo == 10 && contenidoCampo.length() > 0){
+
+            String nombreCampo = camposArticulo.get(campo);
+
+            doc.add(new TextField(nombreCampo, contenidoCampo, Field.Store.YES));
+            doc.add(new SortedDocValuesField(nombreCampo, new BytesRef(contenidoCampo)));
+
+            String[] facetsNew = modificarFacetaAuthor(contenidoCampo);
+            for (String s : facetsNew) {
+                doc.add(new FacetField(nombreCampo, s));
+            }
+        }
+
         //Introducimos los datos referentes al titulo || fuente || abstract || author.
-        if ((campo == 10 || campo == 9 || campo == 7 || campo == 4) && contenidoCampo.length() > 0){
+        else if ((campo == 9 || campo == 7 || campo == 4) && contenidoCampo.length() > 0){
 
             String nombreCampo = camposArticulo.get(campo);
 
@@ -231,7 +258,7 @@ public class AnalyzerStep {
             doc.add(new TextField(nombreCampo, contenidoCampo, Field.Store.YES));
             doc.add(new SortedDocValuesField(nombreCampo, new BytesRef(contenidoCampo)));
 
-            String[] facetsNew = modificarFaceta(contenidoCampo);
+            String[] facetsNew = modificarFacetaKeyword(contenidoCampo);
             for (String s : facetsNew) {
                 doc.add(new FacetField(nombreCampo, s));
             }
