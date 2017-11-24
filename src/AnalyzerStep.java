@@ -23,8 +23,27 @@ public class AnalyzerStep {
     private Scanner scanner;
     private Map<String,Analyzer> analyzerPerField;
     PerFieldAnalyzerWrapper aWrapper;
+    HashMap<Integer, String> camposArticulo;
 
     public AnalyzerStep()throws Exception{
+
+        //_________Estructura para saber en cada momento donde guardar los datos de un artículo__________\\
+
+        camposArticulo = new HashMap<>();
+
+        camposArticulo.put(1, "EID");
+        camposArticulo.put(2, "keywords index");
+        camposArticulo.put(3, "keywords author");
+        camposArticulo.put(4, "abstract");
+        camposArticulo.put(5, "link");
+        camposArticulo.put(6, "cited by");
+        camposArticulo.put(7, "source");
+        camposArticulo.put(8, "year");
+        camposArticulo.put(9, "title");
+        camposArticulo.put(10, "author");
+
+        //________________________________________________________________________\\
+
 
         analyzerPerField = new HashMap<>();
 
@@ -90,7 +109,10 @@ public class AnalyzerStep {
         scanner.close();
     }
 
+    //_______________________Función que particiona las facetas por los puntos comas y espacios_______________________\\
     public String [] modificarFaceta(String cadena){
+
+        cadena = cadena.toLowerCase();
 
         String [] facetas = cadena.split("; ");
 
@@ -98,6 +120,7 @@ public class AnalyzerStep {
 
     }
 
+    //_______________________Función para realizar el preprocesamiento de los documentos CSV__________________________\\
     public void preprocesamientoTexto(String ruta, IndexWriter writer, FacetsConfig facetsConfig,
                                       DirectoryTaxonomyWriter taxoWriter)throws Exception {
 
@@ -171,63 +194,47 @@ public class AnalyzerStep {
         }
     }
 
+    //______________________Función que inserta los datos en los campos del documento a indexar_______________________\\
     public void insertarCampo(String contenidoCampo, int campo, Document doc){
 
-        if (campo == 10){
-            //Aplicamos Analyzer para el campo Author.
-            doc.add(new TextField("author", contenidoCampo, Field.Store.YES));
-        }
-        else if(campo == 9){
-            //Aplicamos Analyzer para el campo Title.
-            doc.add(new TextField("title", contenidoCampo, Field.Store.YES));
-        }
-        else if(campo == 8){
-            //Aplicamos Analyzer para el campo Year.
-            doc.add(new NumericDocValuesField("year", Integer.parseInt(contenidoCampo)));
-            doc.add(new StoredField("year", Integer.parseInt(contenidoCampo)));
-            doc.add(new FacetField("year", contenidoCampo));
-        }
-        else if(campo == 7){
-            //Aplicamos Analyzer para el campo Source.
-            doc.add(new TextField("source", contenidoCampo, Field.Store.YES));
-        }
-        else if(campo == 6){
-            //Aplicamos Analyzer para el campo Cited by.
-            doc.add(new NumericDocValuesField("cited by", Integer.parseInt(contenidoCampo)));
-            doc.add(new StoredField("cited by", Integer.parseInt(contenidoCampo)));
-            doc.add(new FacetField("cited by", contenidoCampo));
-        }
-        else if(campo == 5){
-            //Aplicamos Analyzer para el campo Link.
-            doc.add(new StringField("link", contenidoCampo, Field.Store.YES));
-        }
-        else if(campo == 4){
-            //Aplicamos Analyzer para el campo Abstract.
-            doc.add(new TextField("abstract", contenidoCampo, Field.Store.YES));
-        }
-        else if(campo == 3 && contenidoCampo.length() > 0){
-            //Aplicamos Analyzer para el campo Keywords1.
-            doc.add(new TextField("keywords author", contenidoCampo, Field.Store.YES));
-            doc.add(new SortedDocValuesField("keywords author", new BytesRef(contenidoCampo)));
+        //Introducimos los datos referentes al titulo || fuente || abstract || author.
+        if ((campo == 10 || campo == 9 || campo == 7 || campo == 4) && contenidoCampo.length() > 0){
 
-            String [] facetsNew = modificarFaceta(contenidoCampo);
-            for (String s: facetsNew){
-                doc.add(new FacetField("keywords author", s));
-            }
-        }
-        else if(campo == 2 && contenidoCampo.length() > 0){
-            //Aplicamos Analyzer para el campo Keywords2.
-            doc.add(new TextField("keywords index", contenidoCampo, Field.Store.YES));
-            doc.add(new SortedDocValuesField("keywords index", new BytesRef(contenidoCampo)));
+            String nombreCampo = camposArticulo.get(campo);
 
-            String [] facetsNew = modificarFaceta(contenidoCampo);
-            for (String s: facetsNew){
-                doc.add(new FacetField("keywords index", s));
-            }
+            doc.add(new TextField(nombreCampo, contenidoCampo, Field.Store.YES));
         }
-        else if(campo == 1){
-            //Aplicamos Analyzer para el campo EID.
-            doc.add(new StringField("EID", contenidoCampo, Field.Store.YES));
+
+        //Introducimos los datos referentes al año || el numero de citas.
+        else if((campo == 8 || campo == 6) && contenidoCampo.length() > 0){
+
+            String nombreCampo = camposArticulo.get(campo);
+
+            doc.add(new NumericDocValuesField(nombreCampo, Integer.parseInt(contenidoCampo)));
+            doc.add(new StoredField(nombreCampo, Integer.parseInt(contenidoCampo)));
+            doc.add(new FacetField(nombreCampo, contenidoCampo));
+        }
+
+        //Aplicamos Analyzer para el campo Link.
+        else if((campo == 5 || campo == 1) && contenidoCampo.length() > 0){
+
+            String nombreCampo = camposArticulo.get(campo);
+
+            doc.add(new StringField(nombreCampo, contenidoCampo, Field.Store.YES));
+        }
+
+        //Introducimos los datos referentes a los keywords.
+        else if((campo == 3 || campo == 2) && contenidoCampo.length() > 0) {
+
+            String nombreCampo = camposArticulo.get(campo);
+
+            doc.add(new TextField(nombreCampo, contenidoCampo, Field.Store.YES));
+            doc.add(new SortedDocValuesField(nombreCampo, new BytesRef(contenidoCampo)));
+
+            String[] facetsNew = modificarFaceta(contenidoCampo);
+            for (String s : facetsNew) {
+                doc.add(new FacetField(nombreCampo, s));
+            }
         }
     }
 }
