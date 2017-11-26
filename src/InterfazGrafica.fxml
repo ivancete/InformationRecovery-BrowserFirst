@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<?import javafx.scene.control.Label?>
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+
+            <TextField fx:id="cajaBuscar" prefWidth="400.0" translateX="200" translateY="10" />
+            <Button fx:id="botonBuscar" layoutX="27.0" mnemonicParsing="false" onAction="#presionarBotonBuscar" text="Buscar" translateX="600" translateY="10" />
+            <Button fx:id="botonSalir" mnemonicParsing="false" onAction="#presionarBotonSalir" text="Salir" translateX="10" translateY="10" />
+
+            <Label translateX="110" translateY="305" text="Fecha de Publicación(Desde)" style="-fx-font-family: sans-serif" />
+            <Label translateX="430" translateY="305" text="hasta" style="-fx-font-family: sans-serif" />
+
+            <TextField fx:id="cajaPrimeraFecha" prefWidth="100.0" translateX="300" translateY="300"/>
+            <TextField fx:id="cajaSegundaFecha" prefWidth="100.0" translateX="500" translateY="300"/>
+
+            <Label translateX="110" translateY="400" text="Citado por(Desde)" style="-fx-font-family: sans-serif" />
+            <Label translateX="430" translateY="400" text="hasta" style="-fx-font-family: sans-serif" />
+
+            <TextField fx:id="cajaPrimeraCitas" prefWidth="100.0" translateX="300" translateY="400"/>
+            <TextField fx:id="cajaSegundaCitas" prefWidth="100.0" translateX="500" translateY="400"/>
+</AnchorPane>
