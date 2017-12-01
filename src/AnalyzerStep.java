@@ -80,9 +80,9 @@ public class AnalyzerStep {
 
     public void indexacionArticulos(String ruta) throws Exception{
 
-        FSDirectory directorioIndice = FSDirectory.open(Paths.get("/Users/Ivanovic/Documents/RI/practicas/P3/indice"));
+        FSDirectory directorioIndice = FSDirectory.open(Paths.get(System.getProperty("user.dir") + "/indice/"));
 
-        FSDirectory facetas = FSDirectory.open(Paths.get("/Users/Ivanovic/Documents/RI/practicas/P3/facetas"));
+        FSDirectory facetas = FSDirectory.open(Paths.get(System.getProperty("user.dir") + "/facetas/"));
 
         IndexWriterConfig config = new IndexWriterConfig(aWrapper);
 
