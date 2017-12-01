@@ -7,8 +7,11 @@ import org.apache.lucene.document.*;
 import org.apache.lucene.facet.FacetField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
@@ -86,6 +89,10 @@ public class AnalyzerStep {
 
         IndexWriterConfig config = new IndexWriterConfig(aWrapper);
 
+        //IndexReader reader = DirectoryReader.open(directorioIndice);
+
+        //IndexSearcher searcher = new IndexSearcher(reader);
+
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 
         FacetsConfig facetsconfig = new FacetsConfig();
@@ -150,6 +157,8 @@ public class AnalyzerStep {
 
             content = scanner.nextLine();
 
+            //boolean repetido = ComprobarDocumentoRepetido(content, searcher);
+
             Document doc = new Document();
 
             for (int campo = 10; campo >= 1; campo--) {
@@ -206,6 +215,26 @@ public class AnalyzerStep {
             writer.addDocument(facetsConfig.build(taxoWriter,doc));
         }
     }
+
+    /*
+    //_____________________Función que comprueba si un documento ya ha sido indexado previamente______________________\\
+    public boolean ComprobarDocumentoRepetido(String documento, IndexSearcher searcher) throws Exception{
+        int centinela = documento.lastIndexOf(',');
+
+        String eid_documento = documento.substring(centinela+1);
+
+        System.out.println(eid_documento);
+
+        Term termino = new Term("EID", eid_documento);
+        Query consulta = new TermQuery(termino);
+
+        TopDocs top = searcher.search(consulta,1);
+
+        System.out.println(searcher.doc(top.scoreDocs[0].doc).get("title"));
+
+        return true;
+    }
+    */
 
     //______________________Función que inserta los datos en los campos del documento a indexar_______________________\\
     public void insertarCampo(String contenidoCampo, int campo, Document doc){
