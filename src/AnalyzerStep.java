@@ -8,10 +8,6 @@ import org.apache.lucene.facet.FacetField;
 import org.apache.lucene.facet.FacetsConfig;
 import org.apache.lucene.facet.taxonomy.directory.DirectoryTaxonomyWriter;
 import org.apache.lucene.index.*;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
@@ -266,6 +262,7 @@ public class AnalyzerStep {
 
             String nombreCampo = camposArticulo.get(campo);
 
+            doc.add(new IntPoint(nombreCampo, Integer.parseInt(contenidoCampo)));
             doc.add(new NumericDocValuesField(nombreCampo, Integer.parseInt(contenidoCampo)));
             doc.add(new StoredField(nombreCampo, Integer.parseInt(contenidoCampo)));
             doc.add(new FacetField(nombreCampo, contenidoCampo));
